@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éclat Salon — Book Your Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a0b;
+    --surface: #16100f;
+    --card: #1e1614;
+    --rose: #c9748a;
+    --rose-light: #e8a0b0;
+    --gold: #c8a96e;
+    --gold-light: #e2c98a;
+    --text: #f0e8e4;
+    --muted: #8a7a76;
+    --border: rgba(200, 169, 110, 0.15);
+    --border-hover: rgba(200, 169, 110, 0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(201, 116, 138, 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(200, 169, 110, 0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 36px 60px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--gold-light);
+  }
+  .logo span { font-style: italic; color: var(--rose-light); }
+
+  nav {
+    display: flex;
+    gap: 32px;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  nav a { color: var(--muted); text-decoration: none; transition: color 0.3s; cursor: pointer; }
+  nav a:hover { color: var(--gold); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 70px 20px 50px;
+    animation: fadeUp 1s 0.2s ease both;
+  }
+  .hero-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .hero h1 em { font-style: italic; color: var(--rose-light); }
+  .hero-sub {
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Decorative line */
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 24px auto;
+  }
+
+  /* BOOKING FORM */
+  .booking-container {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto 60px;
+    padding: 0 24px;
+    animation: fadeUp 1s 0.4s ease both;
+  }
+
+  /* STEP TABS */
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 40px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .step-tab {
+    flex: 1;
+    padding: 14px 10px;
+    text-align: center;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    transition: all 0.3s;
+    position: relative;
+    background: var(--surface);
+  }
+  .step-tab:last-child { border-right: none; }
+  .step-tab.active {
+    color: var(--gold);
+    background: var(--card);
+  }
+  .step-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+  }
+  .step-tab.done { color: var(--rose-light); }
+  .step-num {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 2px;
+  }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* SERVICE GRID */
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .service-card {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201, 116, 138, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .service-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+  .service-card:hover::before { opacity: 1; }
+  .service-card.selected {
+    border-color: var(--rose);
+    background: var(--card);
+  }
+  .service-card.selected::before { opacity: 1; }
+
+  .service-icon { font-size: 1.8rem; margin-bottom: 12px; }
+  .service-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .service-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .service-price {
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+  }
+  .service-check {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 20px; height: 20px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem;
+    color: transparent;
+    transition: all 0.3s;
+    background: transparent;
+  }
+  .service-card.selected .service-check {
+    background: var(--rose);
+    border-color: var(--rose);
+    color: white;
+  }
+
+  /* STAFF GRID */
+  .staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .staff-card {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--surface);
+  }
+  .staff-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+  .staff-card.selected { border-color: var(--rose); background: var(--card); }
+  .staff-avatar {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    border: 1px solid var(--border);
+  }
+  .staff-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+  .staff-role { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
+
+  /* DATE / TIME */
+  .date-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .date-cell {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 10px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--surface);
+  }
+  .date-cell:hover { border-color: var(--border-hover); }
+  .date-cell.selected { border-color: var(--gold); background: var(--card); color: var(--gold); }
+  .date-cell.disabled { opacity: 0.3; cursor: not-allowed; }
+  .date-day { font-size: 0.55rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+  .date-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    line-height: 1.2;
+  }
+
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .time-slot {
+    border: 1px solid var(--border);
+    padding: 10px;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--surface);
+    border-radius: 2px;
+  }
+  .time-slot:hover { border-color: var(--border-hover); }
+  .time-slot.selected { border-color: var(--gold); color: var(--gold); background: var(--card); }
+  .time-slot.booked { opacity: 0.25; cursor: not-allowed; text-decoration: line-through; }
+
+  /* FORM FIELDS */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  input, select, textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 300;
+    padding: 12px 14px;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+  select option { background: var(--card); }
+  textarea { resize: none; height: 80px; }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+
+  /* SUMMARY PANEL */
+  .summary-box {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 28px 30px;
+    background: var(--surface);
+    margin-bottom: 24px;
+  }
+  .summary-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    margin-bottom: 20px;
+    color: var(--gold-light);
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.78rem;
+  }
+  .summary-row:last-of-type { border-bottom: none; }
+  .summary-key { color: var(--muted); letter-spacing: 0.1em; }
+  .summary-val { color: var(--text); text-align: right; }
+  .summary-total {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .summary-total .key { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+  .summary-total .val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    color: var(--gold-light);
+  }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .btn {
+    padding: 14px 36px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rose), var(--rose-light));
+    color: white;
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(201, 116, 138, 0.3);
+  }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-secondary:hover { border-color: var(--border-hover); color: var(--text); }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--bg);
+  }
+  .btn-gold:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(200, 169, 110, 0.3);
+  }
+
+  /* SUCCESS */
+  .success-panel {
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .success-icon {
+    font-size: 3rem;
+    margin-bottom: 24px;
+    display: block;
+  }
+  .success-panel h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+  }
+  .success-panel p { color: var(--muted); font-size: 0.8rem; line-height: 1.8; max-width: 420px; margin: 0 auto 32px; }
+  .booking-ref {
+    display: inline-block;
+    border: 1px solid var(--border);
+    padding: 12px 28px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    margin-bottom: 32px;
+  }
+
+  /* ALERTS */
+  .alert {
+    padding: 10px 16px;
+    border-radius: 2px;
+    font-size: 0.72rem;
+    margin-bottom: 16px;
+    display: none;
+    letter-spacing: 0.05em;
+  }
+  .alert.error { background: rgba(201, 116, 138, 0.1); border: 1px solid rgba(201, 116, 138, 0.3); color: var(--rose-light); display: block; }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 30px;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 24px 20px 0; flex-direction: column; gap: 16px; }
+    nav { gap: 20px; }
+    .date-grid { grid-template-columns: repeat(4, 1fr); }
+    .time-grid { grid-template-columns: repeat(3, 1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    .steps { flex-wrap: wrap; }
+    .step-tab { flex: 1 0 33%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">A`<span>ura</span></div>
+  <nav>
+    <a>Services</a>
+    <a>Gallery</a>
+    <a>About</a>
+    <a>Contact</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <p class="hero-eyebrow">✦ Luxury Salon & Beauty Studio</p>
+  <h1>Book Your<br><em>Beauty Experience</em></h1>
+  <div class="divider"></div>
+  <p class="hero-sub">Effortless appointments · Expert stylists · Timeless results</p>
+</div>
+
+<div class="booking-container">
+  <!-- Step Tabs -->
+  <div class="steps">
+    <div class="step-tab active" id="tab-1" onclick="goToStep(1)">
+      <span class="step-num">01</span>Service
+    </div>
+    <div class="step-tab" id="tab-2" onclick="goToStep(2)">
+      <span class="step-num">02</span>Stylist
+    </div>
+    <div class="step-tab" id="tab-3" onclick="goToStep(3)">
+      <span class="step-num">03</span>Date & Time
+    </div>
+    <div class="step-tab" id="tab-4" onclick="goToStep(4)">
+      <span class="step-num">04</span>Your Details
+    </div>
+    <div class="step-tab" id="tab-5" onclick="goToStep(5)">
+      <span class="step-num">05</span>Confirm
+    </div>
+  </div>
+
+  <!-- PANEL 1: Services -->
+  <div class="panel active" id="panel-1">
+    <p class="section-label">Choose your service(s)</p>
+    <div id="alert-1" class="alert"></div>
+    <div class="services-grid">
+      <div class="service-card" onclick="toggleService(this, 'Bridal Makeup', 3500)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">💄</div>
+        <div class="service-name">Bridal Makeup</div>
+        <div class="service-desc">Full glam bridal look with trial session and touch-up kit.</div>
+        <div class="service-price">From ₹3,500</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Party Makeup', 1800)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">✨</div>
+        <div class="service-name">Party Makeup</div>
+        <div class="service-desc">Statement looks for events, receptions & special nights out.</div>
+        <div class="service-price">From ₹1,800</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Hair Cutting', 600)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">✂️</div>
+        <div class="service-name">Hair Cutting</div>
+        <div class="service-desc">Precision cuts, layers, bangs and styling by expert stylists.</div>
+        <div class="service-price">From ₹600</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Hair Coloring', 2200)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">🎨</div>
+        <div class="service-name">Hair Coloring</div>
+        <div class="service-desc">Global color, highlights, balayage, ombre & creative tones.</div>
+        <div class="service-price">From ₹2,200</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Hair Spa', 1200)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">🌿</div>
+        <div class="service-name">Hair Spa</div>
+        <div class="service-desc">Deep conditioning, scalp massage and nourishing treatment.</div>
+        <div class="service-price">From ₹1,200</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Nail Polish', 400)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">💅</div>
+        <div class="service-name">Nail Polish</div>
+        <div class="service-desc">Classic manicure with premium polish in any shade.</div>
+        <div class="service-price">From ₹400</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Gel Nails', 900)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">💎</div>
+        <div class="service-name">Gel Nails</div>
+        <div class="service-desc">Long-lasting gel manicure & pedicure with nail art options.</div>
+        <div class="service-price">From ₹900</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Facial', 1500)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">🌸</div>
+        <div class="service-name">Facial</div>
+        <div class="service-desc">Cleansing, exfoliation & glow facial for radiant skin.</div>
+        <div class="service-price">From ₹1,500</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Eyebrows & Lashes', 350)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">👁️</div>
+        <div class="service-name">Brows & Lashes</div>
+        <div class="service-desc">Threading, tinting, shaping, lash extensions & lifts.</div>
+        <div class="service-price">From ₹350</div>
+      </div>
+      <div class="service-card" onclick="toggleService(this, 'Mehndi (Henna)', 800)">
+        <div class="service-check">✓</div>
+        <div class="service-icon">🌺</div>
+        <div class="service-name">Mehndi (Henna)</div>
+        <div class="service-desc">Traditional & contemporary henna designs for all occasions.</div>
+        <div class="service-price">From ₹800</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="nextStep(1)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 2: Stylist -->
+  <div class="panel" id="panel-2">
+    <p class="section-label">Choose your stylist</p>
+    <div id="alert-2" class="alert"></div>
+    <div class="staff-grid">
+      <div class="staff-card" onclick="selectStaff(this, 'Priya Sharma')">
+        <div class="staff-avatar">👩🏽</div>
+        <div class="staff-name">Priya Sharma</div>
+        <div class="staff-role">Makeup Artist</div>
+      </div>
+      <div class="staff-card" onclick="selectStaff(this, 'Neha Kapoor')">
+        <div class="staff-avatar">👩🏻</div>
+        <div class="staff-name">Neha Kapoor</div>
+        <div class="staff-role">Hair Specialist</div>
+      </div>
+      <div class="staff-card" onclick="selectStaff(this, 'Anjali Verma')">
+        <div class="staff-avatar">👩🏾</div>
+        <div class="staff-name">Anjali Verma</div>
+        <div class="staff-role">Nail Technician</div>
+      </div>
+      <div class="staff-card" onclick="selectStaff(this, 'Sonal Gupta')">
+        <div class="staff-avatar">👩🏽‍🦱</div>
+        <div class="staff-name">Sonal Gupta</div>
+        <div class="staff-role">Skin Expert</div>
+      </div>
+      <div class="staff-card" onclick="selectStaff(this, 'No Preference')">
+        <div class="staff-avatar" style="font-size:1.2rem;">Any</div>
+        <div class="staff-name">No Preference</div>
+        <div class="staff-role">First Available</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 3: Date & Time -->
+  <div class="panel" id="panel-3">
+    <p class="section-label">Select date & time</p>
+    <div id="alert-3" class="alert"></div>
+    <div class="date-grid" id="date-grid"></div>
+    <p class="section-label" style="margin-top:8px;">Available time slots</p>
+    <div class="time-grid" id="time-grid"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep(3)">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 4: Details -->
+  <div class="panel" id="panel-4">
+    <p class="section-label">Your details</p>
+    <div id="alert-4" class="alert"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" id="fname" placeholder="e.g. Anika">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" id="lname" placeholder="e.g. Sharma">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="phone" placeholder="+91 98XXX XXXXX">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="you@email.com">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group full">
+        <label>Special Requests (optional)</label>
+        <textarea id="notes" placeholder="Any allergies, special requirements or notes for your stylist…"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep(4)">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep(4)">Review Booking →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 5: Confirm -->
+  <div class="panel" id="panel-5">
+    <p class="section-label">Review & confirm</p>
+    <div class="summary-box">
+      <div class="summary-title">Booking Summary</div>
+      <div id="summary-content"></div>
+      <div class="summary-total">
+        <span class="key">Estimated Total</span>
+        <span class="val" id="summary-total-val">₹0</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep(5)">← Edit</button>
+      <button class="btn btn-gold" onclick="confirmBooking()">Confirm Appointment ✦</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="panel" id="panel-success">
+    <div class="success-panel">
+      <span class="success-icon">✦</span>
+      <h2>Appointment Confirmed</h2>
+      <p>Thank you! Your booking has been received. We'll send a confirmation to your email shortly. We look forward to welcoming you.</p>
+      <div class="booking-ref" id="booking-ref">ÉCLAT-0000</div>
+      <br>
+      <button class="btn btn-primary" onclick="resetBooking()">Book Another Appointment</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2026 Éclat Salon &nbsp;·&nbsp; Greater Noida &nbsp;·&nbsp; All rights reserved
+</footer>
+
+<script>
+  // ---- STATE ----
+  const state = {
+    services: [],   // [{name, price}]
+    stylist: '',
+    date: '',
+    time: '',
+    fname: '', lname: '', phone: '', email: '', notes: ''
+  };
+  let currentStep = 1;
+
+  // ---- SERVICES ----
+  function toggleService(card, name, price) {
+    card.classList.toggle('selected');
+    const idx = state.services.findIndex(s => s.name === name);
+    if (idx === -1) {
+      state.services.push({ name, price });
+    } else {
+      state.services.splice(idx, 1);
+    }
+  }
+
+  // ---- STAFF ----
+  function selectStaff(card, name) {
+    document.querySelectorAll('.staff-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.stylist = name;
+  }
+
+  // ---- DATES ----
+  function buildDates() {
+    const grid = document.getElementById('date-grid');
+    grid.innerHTML = '';
+    const today = new Date();
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const cell = document.createElement('div');
+      cell.className = 'date-cell' + (i === 0 ? ' disabled' : '');
+      cell.innerHTML = `<div class="date-day">${days[d.getDay()]}</div><div class="date-num">${d.getDate()}</div>`;
+      const ds = d.toDateString();
+      if (i !== 0) {
+        cell.onclick = () => {
+          document.querySelectorAll('.date-cell').forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+          state.date = ds;
+        };
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  function buildTimes() {
+    const grid = document.getElementById('time-grid');
+    grid.innerHTML = '';
+    const slots = ['10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM','12:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM','4:30 PM','5:00 PM','5:30 PM','6:00 PM','6:30 PM'];
+    const booked = [2, 5, 9]; // pretend some are taken
+    slots.forEach((slot, i) => {
+      const el = document.createElement('div');
+      el.className = 'time-slot' + (booked.includes(i) ? ' booked' : '');
+      el.textContent = slot;
+      if (!booked.includes(i)) {
+        el.onclick = () => {
+          document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+          el.classList.add('selected');
+          state.time = slot;
+        };
+      }
+      grid.appendChild(el);
+    });
+  }
+
+  // ---- SUMMARY ----
+  function buildSummary() {
+    state.fname = document.getElementById('fname').value.trim();
+    state.lname = document.getElementById('lname').value.trim();
+    state.phone = document.getElementById('phone').value.trim();
+    state.email = document.getElementById('email').value.trim();
+    state.notes = document.getElementById('notes').value.trim();
+
+    const rows = [
+      ['Services', state.services.map(s => s.name).join(', ') || '—'],
+      ['Stylist', state.stylist || '—'],
+      ['Date', state.date || '—'],
+      ['Time', state.time || '—'],
+      ['Guest', `${state.fname} ${state.lname}`.trim() || '—'],
+      ['Phone', state.phone || '—'],
+      ['Email', state.email || '—'],
+    ];
+    if (state.notes) rows.push(['Notes', state.notes]);
+
+    const html = rows.map(([k, v]) =>
+      `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`
+    ).join('');
+    document.getElementById('summary-content').innerHTML = html;
+
+    const total = state.services.reduce((sum, s) => sum + s.price, 0);
+    document.getElementById('summary-total-val').textContent = '₹' + total.toLocaleString('en-IN');
+  }
+
+  // ---- NAVIGATION ----
+  function showAlert(panelNum, msg) {
+    const el = document.getElementById('alert-' + panelNum);
+    if (el) { el.textContent = msg; el.className = 'alert error'; }
+  }
+  function clearAlert(panelNum) {
+    const el = document.getElementById('alert-' + panelNum);
+    if (el) { el.className = 'alert'; el.textContent = ''; }
+  }
+
+  function nextStep(from) {
+    clearAlert(from);
+    if (from === 1 && state.services.length === 0) {
+      showAlert(1, 'Please select at least one service to continue.');
+      return;
+    }
+    if (from === 2 && !state.stylist) {
+      showAlert(2, 'Please choose a stylist to continue.');
+      return;
+    }
+    if (from === 3) {
+      if (!state.date) { showAlert(3, 'Please select a date.'); return; }
+      if (!state.time) { showAlert(3, 'Please select a time slot.'); return; }
+    }
+    if (from === 4) {
+      const f = document.getElementById('fname').value.trim();
+      const p = document.getElementById('phone').value.trim();
+      const e = document.getElementById('email').value.trim();
+      if (!f || !p || !e) { showAlert(4, 'Please fill in your name, phone and email.'); return; }
+      if (!/^\+?[\d\s\-]{8,}$/.test(p)) { showAlert(4, 'Please enter a valid phone number.'); return; }
+      buildSummary();
+    }
+    goToStep(from + 1);
+  }
+
+  function prevStep(from) { goToStep(from - 1); }
+
+  function goToStep(n) {
+    if (n < 1 || n > 5) return;
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.step-tab').forEach((t, i) => {
+      t.classList.remove('active', 'done');
+      if (i + 1 < n) t.classList.add('done');
+      if (i + 1 === n) t.classList.add('active');
+    });
+    document.getElementById('panel-' + n).classList.add('active');
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function confirmBooking() {
+    // Generate ref
+    const ref = 'ÉCLAT-' + Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('booking-ref').textContent = ref;
+
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.step-tab').forEach(t => { t.classList.remove('active'); t.classList.add('done'); });
+    document.getElementById('panel-success').classList.add('active');
+  }
+
+  function resetBooking() {
+    // Reset state
+    state.services = []; state.stylist = ''; state.date = ''; state.time = '';
+    state.fname = ''; state.lname = ''; state.phone = ''; state.email = ''; state.notes = '';
+
+    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.staff-card').forEach(c => c.classList.remove('selected'));
+    ['fname','lname','phone','email','notes'].forEach(id => document.getElementById(id).value = '');
+
+    document.getElementById('panel-success').classList.remove('active');
+    goToStep(1);
+    buildDates();
+    buildTimes();
+  }
+
+  // ---- INIT ----
+  buildDates();
+  buildTimes();
+</script>
+</body>
+</html>
